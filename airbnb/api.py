@@ -226,6 +226,17 @@ class Api(object):
 
     # Host APIs
 
+    def get_user(self, user_id):
+
+        params = {
+            '_format': 'with_content_framework_articles'
+        }
+        
+        r = self._session.get(API_URL + "/users/" + str(user_id), params=params)
+        r.raise_for_status()
+
+        return r.json()
+
     @require_auth
     def get_listing_calendar(self, listing_id, starting_date=datetime.datetime.now(), calendar_months=6):
         """
@@ -237,10 +248,87 @@ class Api(object):
 
         starting_date_str = starting_date.strftime("%Y-%m-%d")
         ending_date_str = (
-            starting_date + datetime.timedelta(days=30)).strftime("%Y-%m-%d")
+            starting_date + datetime.timedelta(days=calendar_months*30)).strftime("%Y-%m-%d")
 
         r = self._session.get(API_URL + "/calendars/{}/{}/{}".format(
             str(listing_id), starting_date_str, ending_date_str), params=params)
+        r.raise_for_status()
+
+        return r.json()
+
+    @require_auth
+    def get_own_listings(self, userId):
+        params = {
+            '_format': "v1_legacy_long",
+            "user_id": userId
+            }
+        r = self._session.get(API_URL + "/listings", params=params)
+
+        return r.json()
+
+    @require_auth
+    def get_reservations(self, offset=0, limit=20, start_date=datetime.datetime.now().strftime("%Y-%m-%d"), mobile=True):
+
+        params = {
+            'collection_strategy': 'for_reservations_list',
+            'date_min': start_date,
+            'sort_field': 'start_date',
+            'sort_order': 'asc',
+            #'_format': 'for_mobile_host',
+            '_format': 'for_remy',
+            '_offset': str(offset),
+            '_limit': str(limit)}
+
+        if mobile: params['_format'] = 'for_mobile_host'
+
+        r = self._session.get(API_URL + "/reservations", params=params)
+
+        return r.json()
+
+    @require_auth
+    def get_threads_full(self, offset=0, limit=18):
+        """
+        Gets messaging threads.
+        """
+        params = {
+            '_format': 'for_messaging_sync_with_posts',
+            '_limit': str(limit),
+            '_offset': str(offset),
+        }
+
+        r = self._session.get(API_URL + "/threads", params=params)
+        r.raise_for_status()
+
+        return r.json()
+
+    @require_auth
+    def getMessageThread(self, thread_id, limit=50, offset=0):
+        """
+        Gets one thread of messages.
+        """
+        params = {
+            '_limit': str(limit),
+            '_ofset': str(offset),
+            'selected_inbox_type': 'host',
+            '_format': 'for_messaging_sync_with_posts'
+        }
+
+        r = self._session.get(API_URL + "/threads", params=params)
+        r.raise_for_status()
+        
+        return r.json()
+
+    @require_auth
+    def send_message(self, thread_id, message):
+        """
+        Sends a message in a thread.
+        """
+        body = {
+            "thread_id": thread_id,
+            "message": message.strip(),
+        }
+
+        r = self._session.post(API_URL + "/messages", data=json.dumps(body))
         r.raise_for_status()
 
         return r.json()
@@ -389,6 +477,8 @@ class Api(object):
         r.raise_for_status()
 
         return r.json()
+
+
 
 
 if __name__ == "__main__":
