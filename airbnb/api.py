@@ -225,7 +225,7 @@ class Api(object):
 
 
     # Host APIs
-
+    @require_auth
     def get_user(self, user_id):
 
         params = {
@@ -235,6 +235,17 @@ class Api(object):
         r = self._session.get(API_URL + "/users/" + str(user_id), params=params)
         r.raise_for_status()
 
+        return r.json()
+
+    @require_auth
+    def get_price_breakdown(self, reservation_code):
+        params = {
+            '_format': 'for_remy',
+            'currency': 'EUR',
+            'locale': 'pt-PT'
+        }
+        r = self._session.get(API_URL + "/homes_host_booking_pricing_quotes/" + reservation_code, params=params)
+        r.raise_for_status()
         return r.json()
 
     @require_auth
