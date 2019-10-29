@@ -297,6 +297,19 @@ class Api(object):
         return r.json()
 
     @require_auth
+    def get_booking_details(self, code):
+        params = {
+            '_format': 'for_remy',
+            'currency': 'EUR',
+            'locale': 'en'
+        }
+
+        r = self._session.get(API_URL + '/homes_booking_details/' + code, params=params)
+        r.raise_for_status()
+        
+        return r.json()
+
+    @require_auth
     def get_threads_full(self, offset=0, limit=18):
         """
         Gets messaging threads.
