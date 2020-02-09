@@ -326,7 +326,7 @@ class Api(object):
         return r.json()
 
     @require_auth
-    def getMessageThread(self, thread_id, limit=50, offset=0):
+    def get_message_thread(self, thread_id, limit=50, offset=0):
         """
         Gets one thread of messages.
         """
@@ -348,11 +348,10 @@ class Api(object):
         Sends a message in a thread.
         """
         body = {
-            "thread_id": thread_id,
             "message": message.strip(),
         }
-
-        r = self._session.post(API_URL + "/messages", data=json.dumps(body))
+        
+        r = self._session.post("https://www.airbnb.com/messaging/qt_reply_v2/" + thread_id, data=json.dumps(body))
         r.raise_for_status()
 
         return r.json()
