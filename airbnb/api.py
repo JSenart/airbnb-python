@@ -351,7 +351,7 @@ class Api(object):
             "message": message.strip(),
         }
         
-        r = self._session.post("https://www.airbnb.com/messaging/qt_reply_v2/" + thread_id, data=json.dumps(body))
+        r = self._session.post("https://www.airbnb.com/messaging/qt_reply_v2/" + str(thread_id), data=json.dumps(body))
         r.raise_for_status()
 
         return r.json()
