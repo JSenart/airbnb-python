@@ -356,7 +356,6 @@ class Api(object):
         # r = self._session.post("https://www.airbnb.com/messaging/qt_reply_v2/" + str(thread_id), data=json.dumps(body))
         r = self._session.post(API_URL + "/messages", data=json.dumps(body))
         
-        import pdb; pdb.set_trace()
         r.raise_for_status()
 
         return r.json()
